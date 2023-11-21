@@ -1,4 +1,4 @@
-const Server = require("./lib/index.js");
+const Server = require("./拦截器/lib/index");
 
 const app = new Server();
 

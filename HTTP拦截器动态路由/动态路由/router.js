@@ -31,7 +31,7 @@ function check(rule, pathname) {
     const ret = {};
     if (paraMatched) {
       for (let i = 0; i < paraMatched.length; i++) {
-        //.slice(1)取出冒号
+        //.slice(1)
         ret[paraMatched[i].slice(1)] = ruleMatched[i + 1];
       }
     }

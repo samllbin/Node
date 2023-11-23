@@ -1,8 +1,5 @@
 const path = require("path");
 const url = require("url");
-const fs = require("fs");
-const mime = require("mime");
-const zlib = require("zlib");
 const sqlite3 = require("sqlite3");
 const { open } = require("sqlite");
 const { Server, Router } = require("./lib/interceptor"); // 这里我们将server 和 router都规划到interceptor包中

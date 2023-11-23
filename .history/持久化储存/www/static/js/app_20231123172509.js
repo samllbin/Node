@@ -75,6 +75,8 @@ async function updateItem(id, state) {
   const result = await (
     await fetch("/update", {
       method: "POST",
+      host: localhost,
+      port: 9090,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -89,6 +91,8 @@ async function saveItem(text) {
   const result = await (
     await fetch("/add", {
       method: "POST",
+      host: localhost,
+      port: 9090,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },

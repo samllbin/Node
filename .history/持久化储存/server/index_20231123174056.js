@@ -1,8 +1,4 @@
 const path = require("path");
-const url = require("url");
-const fs = require("fs");
-const mime = require("mime");
-const zlib = require("zlib");
 const sqlite3 = require("sqlite3");
 const { open } = require("sqlite");
 const { Server, Router } = require("./lib/interceptor"); // 这里我们将server 和 router都规划到interceptor包中
@@ -141,8 +137,10 @@ app.use(
   router.get(".*", async ({ req, res }, next) => {
     console.log(__dirname);
     console.log(req.url);
-    let filePath = path.join(__dirname, "../www", req.url.replace(/^\/+/, ""));
-
+    let filePath = path.resolve(
+      __dirname,
+      path.join("./www", url.fileURLToPath(`file:/${req.url}`))
+    );
     console.log(filePath);
     if (fs.existsSync(filePath)) {
       const stats = fs.statSync(filePath);

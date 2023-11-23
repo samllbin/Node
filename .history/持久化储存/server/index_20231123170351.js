@@ -1,8 +1,4 @@
 const path = require("path");
-const url = require("url");
-const fs = require("fs");
-const mime = require("mime");
-const zlib = require("zlib");
 const sqlite3 = require("sqlite3");
 const { open } = require("sqlite");
 const { Server, Router } = require("./lib/interceptor"); // 这里我们将server 和 router都规划到interceptor包中
@@ -116,101 +112,29 @@ app.use(
 
 app.use(
   router.post("/login", async (ctx, next) => {
+    console.log(1);
     const { database, params, res } = ctx;
     const { login } = require("./model/user");
     const result = await login(database, ctx, params);
     res.statusCode = 302;
     if (!result) {
       // 登录失败，跳转到login继续登录
-
       console.log("登录失败");
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader(
         "Location",
-        "http://127.0.0.1:5500/HTTP/%E6%8C%81%E4%B9%85%E5%8C%96%E5%82%A8%E5%AD%98/www/login.html"
+        "file:///C:/Users/86150/Desktop/node%E5%90%8E%E7%AB%AF/HTTP/%E6%8C%81%E4%B9%85%E5%8C%96%E5%82%A8%E5%AD%98/www/login.html"
       );
     } else {
-      res.setHeader("Location", "/");
-      res.end();
+      res.setHeader(
+        "Location",
+        "file:///C:/Users/86150/Desktop/node%E5%90%8E%E7%AB%AF/HTTP/%E6%8C%81%E4%B9%85%E5%8C%96%E5%82%A8%E5%AD%98/www/index.html"
+      ); // 成功，跳转到 index
     }
-
     await next();
   })
 );
-app.use(
-  router.get(".*", async ({ req, res }, next) => {
-    console.log(__dirname);
-    console.log(req.url);
-    let filePath = path.join(__dirname, "../www", req.url.replace(/^\/+/, ""));
 
-    console.log(filePath);
-    if (fs.existsSync(filePath)) {
-      const stats = fs.statSync(filePath);
-      if (stats.isDirectory()) {
-        filePath = path.join(filePath, "index.html");
-      }
-      if (fs.existsSync(filePath)) {
-        const { ext } = path.parse(filePath);
-        const stats = fs.statSync(filePath);
-        const timeStamp = req.headers["if-modified-since"];
-        res.statusCode = 200;
-        if (timeStamp && Number(timeStamp) === stats.mtimeMs) {
-          res.statusCode = 304;
-        }
-        const mimeType = mime.getType(ext);
-        res.setHeader("Content-Type", mimeType);
-        res.setHeader("Cache-Control", "max-age=86400");
-        res.setHeader("Last-Modified", stats.mtimeMs);
-        const acceptEncoding = req.headers["accept-encoding"];
-        const compress =
-          acceptEncoding && /^(text|application)\//.test(mimeType);
-        let compressionEncoding;
-        if (compress) {
-          acceptEncoding.split(/\s*,\s*/).some((encoding) => {
-            if (encoding === "gzip") {
-              res.setHeader("Content-Encoding", "gzip");
-              compressionEncoding = encoding;
-              return true;
-            }
-            if (encoding === "deflate") {
-              res.setHeader("Content-Encoding", "deflate");
-              compressionEncoding = encoding;
-              return true;
-            }
-            if (encoding === "br") {
-              res.setHeader("Content-Encoding", "br");
-              compressionEncoding = encoding;
-              return true;
-            }
-            return false;
-          });
-        }
-        if (res.statusCode === 200) {
-          const fileStream = fs.createReadStream(filePath);
-          if (compress && compressionEncoding) {
-            let comp;
-            if (compressionEncoding === "gzip") {
-              comp = zlib.createGzip();
-            } else if (compressionEncoding === "deflate") {
-              comp = zlib.createDeflate();
-            } else {
-              comp = zlib.createBrotliCompress();
-            }
-            res.body = fileStream.pipe(comp);
-          } else {
-            res.body = fileStream;
-          }
-        }
-      }
-    } else {
-      res.setHeader("Content-Type", "text/html");
-      res.body = "<h1>Not Found</h1>";
-      res.statusCode = 404;
-    }
-
-    await next();
-  })
-);
 app.use(
   router.all(".*", async ({ params, req, res }, next) => {
     res.setHeader("Content-Type", "text/html");

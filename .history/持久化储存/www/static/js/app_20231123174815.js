@@ -75,6 +75,8 @@ async function updateItem(id, state) {
   const result = await (
     await fetch("/update", {
       method: "POST",
+      host: localhost,
+      port: 9090,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -89,6 +91,8 @@ async function saveItem(text) {
   const result = await (
     await fetch("/add", {
       method: "POST",
+      host: localhost,
+      port: 9090,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -104,9 +108,7 @@ async function loadItems(list) {
     await fetch("http://localhost:9090/list")
   ).json();
   if (err) {
-    window.location.replace(
-      "file:///C:/Users/86150/Desktop/node%E5%90%8E%E7%AB%AF/HTTP/%E6%8C%81%E4%B9%85%E5%8C%96%E5%82%A8%E5%AD%98/www/login.html"
-    );
+    window.location.replace("/login.html");
   } else {
     data.forEach(({ id, state, text }) =>
       addItem(id, list, text, states[state])

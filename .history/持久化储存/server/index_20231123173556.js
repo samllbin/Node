@@ -1,8 +1,4 @@
 const path = require("path");
-const url = require("url");
-const fs = require("fs");
-const mime = require("mime");
-const zlib = require("zlib");
 const sqlite3 = require("sqlite3");
 const { open } = require("sqlite");
 const { Server, Router } = require("./lib/interceptor"); // 这里我们将server 和 router都规划到interceptor包中
@@ -130,7 +126,7 @@ app.use(
         "http://127.0.0.1:5500/HTTP/%E6%8C%81%E4%B9%85%E5%8C%96%E5%82%A8%E5%AD%98/www/login.html"
       );
     } else {
-      res.setHeader("Location", "/");
+      res.setHeader("Location", "../www/index.html");
       res.end();
     }
 
@@ -139,11 +135,11 @@ app.use(
 );
 app.use(
   router.get(".*", async ({ req, res }, next) => {
-    console.log(__dirname);
-    console.log(req.url);
-    let filePath = path.join(__dirname, "../www", req.url.replace(/^\/+/, ""));
+    let filePath = path.resolve(
+      __dirname,
+      path.join("../www", url.fileURLToPath(`file:///${req.url}`))
+    );
 
-    console.log(filePath);
     if (fs.existsSync(filePath)) {
       const stats = fs.statSync(filePath);
       if (stats.isDirectory()) {
